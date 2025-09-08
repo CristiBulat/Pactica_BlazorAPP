@@ -1,0 +1,63 @@
+@page "/products/add"
+@page "/products/edit/{id:int}"
+@using BlazorApp.Domain.Entities
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<h3>@(IsEditMode ? "Edit" : "Add") Product</h3>
+
+<EditForm Model="@product" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <InputText id="name" @bind-Value="product.Name" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label for="price" class="form-label">Price</label>
+        <InputNumber id="price" @bind-Value="product.Price" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <InputText id="description" @bind-Value="product.Description" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Product product = new();
+    private bool IsEditMode => Id != 0;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsEditMode)
+        {
+            // Ensure the product is not null after fetching, if not found, create a new one.
+            product = await Http.GetFromJsonAsync<Product>($"api/products/{Id}") ?? new();
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (IsEditMode)
+        {
+            await Http.PutAsJsonAsync($"api/products/{Id}", product);
+        }
+        else
+        {
+            await Http.PostAsJsonAsync("api/products", product);
+        }
+        Navigation.NavigateTo("/products");
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/products");
+    }
+}

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using BlazorApp.Domain.Entities; // Changed from BlazorApp.Domain
 
 namespace BlazorApp.Infrastructure;
 
@@ -8,6 +9,5 @@ public class ApplicationDbContext : DbContext
     {
     }
 
-    // Add your DbSets here. For example:
-    // public DbSet<Product> Products { get; set; }
+    public DbSet<Product> Products { get; set; }
 }

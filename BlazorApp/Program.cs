@@ -1,7 +1,7 @@
 using BlazorApp.Client.Pages;
 using BlazorApp.Components;
-using BlazorApp.Infrastructure; 
-using Microsoft.EntityFrameworkCore; 
+using BlazorApp.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 
-// Add the DbContext
+builder.Services.AddControllers();
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!
     .Replace("${MYSQL_ROOT_PASSWORD}", Environment.GetEnvironmentVariable("MYSQL_ROOT_PASSWORD"));
 
@@ -26,17 +27,17 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
     .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(BlazorApp.Client._Imports).Assembly);
+    .AddAdditionalAssemblies(typeof(BlazorApp.Client.Routes).Assembly); // Use Routes instead of _Imports
+
+app.MapControllers();
 
 app.Run();
